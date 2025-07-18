@@ -1,15 +1,19 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 public class ScreenEffect : MonoBehaviour
 {
     public char keybind;
-    
+
     public float duration = 0.5f;
     public float magnitude = 1f;
     public AnimationCurve animationCurve;
+    public Volume volume;
 
     private bool isActive = false;
+    private LensDistortion lensDistortion;
 
     void Update()
     {
@@ -21,7 +25,7 @@ public class ScreenEffect : MonoBehaviour
                 if (Input.GetKeyDown(code))
                 {
                     isActive = true;
-                    Debug.Log("SHAKING");
+                    Debug.Log("ACTIVATING SCREEN EFFECTS");
                     ActivateEffects(true);
                 }
             }
@@ -35,9 +39,8 @@ public class ScreenEffect : MonoBehaviour
     public void ActivateEffects(bool fullEffect)
     {
         StartCoroutine(RotateShake());
-        if (fullEffect) StartCoroutine(FOVPulse());
+        if (fullEffect) StartCoroutine(DistortionPulse());
     }
-
 
     IEnumerator RotateShake()
     {
@@ -61,16 +64,15 @@ public class ScreenEffect : MonoBehaviour
         isActive = false;
     }
 
-    IEnumerator FOVPulse()
+    IEnumerator DistortionPulse()
     {
-        Camera cam = GetComponent<Camera>();
-        if (cam == null)
+        if (volume == null || !volume.profile.TryGet(out lensDistortion))
         {
-            Debug.LogWarning("FOVPulse: No Camera component found on GameObject.");
+            Debug.LogWarning("DistortionPulse: LensDistortion not found on Volume.");
             yield break;
         }
 
-        float originalFOV = cam.fieldOfView;
+        float originalIntensity = lensDistortion.intensity.value;
         float elapsed = 0f;
 
         while (elapsed < duration)
@@ -78,17 +80,14 @@ public class ScreenEffect : MonoBehaviour
             elapsed += Time.deltaTime;
             float strength = animationCurve != null ? animationCurve.Evaluate(elapsed / duration) : 1f;
 
-            // Increase FOV based on magnitude and curve
-            float targetFOV = originalFOV + (magnitude * strength) * 10f;
-            cam.fieldOfView = targetFOV;
+            // Apply distortion pulse
+            lensDistortion.intensity.value = originalIntensity + (magnitude * strength) / 2f;
 
             yield return null;
         }
 
-        // Restore original FOV
-        cam.fieldOfView = originalFOV;
+        // Restore original distortion intensity
+        lensDistortion.intensity.value = originalIntensity;
         isActive = false;
     }
-
-
 }
