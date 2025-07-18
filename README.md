@@ -1,1 +1,2 @@
-# CubeMapProjection
+# Cubemap Projection Media Player
+
