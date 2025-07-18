@@ -8,7 +8,14 @@
 /[Bb]uilds/
 /[Ll]ogs/
 /[Uu]ser[Ss]ettings/
-/Assets/StreamingAssets/
+
+# Ignore everything in StreamingAssets
+/Assets/StreamingAssets/*
+
+# But keep the folder and this .gitkeep file (or others you want)
+/Assets/StreamingAssets/.gitkeep
+!/Assets/StreamingAssets/.gitkeep
+
 
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data
