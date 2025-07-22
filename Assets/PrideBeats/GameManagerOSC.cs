@@ -40,12 +40,21 @@ public class GameManagerOSC : MonoBehaviour
        }
     }
 
+    public List<float> startSequence = new List<float> { 0.5f, 1.0f, 0.75f }; // Example pattern
     public void StartGame()
     {
         var startMsg = new OSCMessage("/StartGame");
+
+        // Add the float sequence to the message
+        foreach (float value in startSequence)
+        {
+            startMsg.AddValue(OSCValue.Float(value));
+        }
+
         transmitter.Send(startMsg);
-        Debug.Log("[GameManager] Broadcasted /StartGame");
+        Debug.Log("[GameManager] Broadcasted /StartGame with " + startSequence.Count + " intervals");
     }
+
 
     public void DrumHit(string IP, string content)
     {
