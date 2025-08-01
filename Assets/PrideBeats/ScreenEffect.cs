@@ -14,6 +14,13 @@ public class ScreenEffect : MonoBehaviour
 
     private bool isActive = false;
     private LensDistortion lensDistortion;
+    private float originalIntensity;
+
+    void Awake()
+    {
+        volume.profile.TryGet<LensDistortion>(out var lensDistortion);
+        originalIntensity = lensDistortion.intensity.value;
+    }
 
     void Update()
     {
@@ -72,7 +79,6 @@ public class ScreenEffect : MonoBehaviour
             yield break;
         }
 
-        float originalIntensity = lensDistortion.intensity.value;
         float elapsed = 0f;
 
         while (elapsed < duration)
