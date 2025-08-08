@@ -2,10 +2,14 @@ using UnityEngine;
 using System.Collections;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+using TMPro;
 
-public class ScreenEffect : MonoBehaviour
+public class ScreenEffects : MonoBehaviour
 {
     public char keybind;
+
+    public Canvas canvas;
+    public TMP_Text playerConnectedText;
 
     public float duration = 0.5f;
     public float magnitude = 1f;
@@ -41,6 +45,11 @@ public class ScreenEffect : MonoBehaviour
                 Debug.LogWarning($"Invalid keybind: {keybind}");
             }
         }
+    }
+
+    public void Init()
+    {
+        playerConnectedText.gameObject.SetActive(true);
     }
 
     public void ActivateEffects(bool fullEffect)

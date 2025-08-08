@@ -18,7 +18,7 @@ public class HideUI : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Tab)){
             OnHideButton();
         }
-        else if (Input.anyKeyDown && !Input.GetKey(KeyCode.RightArrow) && !Input.GetKey(KeyCode.LeftArrow) && UI_hidden){
+        else if (Input.anyKeyDown && !Input.GetKey(KeyCode.RightArrow) && !Input.GetKey(KeyCode.LeftArrow) && !Input.GetKey(KeyCode.Space) && UI_hidden){
             OnHideButton();
         }
     }
