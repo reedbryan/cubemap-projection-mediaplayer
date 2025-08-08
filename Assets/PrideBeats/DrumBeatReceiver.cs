@@ -8,7 +8,7 @@ public class OSCReceiverAll : MonoBehaviour
     public int port = 8000;
 
     private OSCReceiver receiver;
-    public GameManagerOSC GM;
+    public GameManager GM;
 
     void Start()
     {
@@ -31,14 +31,13 @@ public class OSCReceiverAll : MonoBehaviour
             string content = message.Values[0].StringValue;
             string ip = message.Values[1].StringValue;
 
-            Debug.Log($"  Content: {content}");            
+            //Debug.Log($"  Content: {content}");            
         }
         else
         {
-            Debug.LogWarning("Received message does not contain expected number of values.");
+            //Debug.LogWarning("Received message does not contain expected number of values.");
         }
     }
-
 
     private void OnDrumHit(OSCMessage message)
     {

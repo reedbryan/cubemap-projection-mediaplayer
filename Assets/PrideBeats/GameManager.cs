@@ -5,16 +5,20 @@ using extOSC;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using System.IO;
 
-public class GameManagerOSC : MonoBehaviour
+
+public class GameManager : MonoBehaviour
 {
     public int questPort;
     public int localPort;
 
+    public ConfigVideoSource configVideoSource;
     private OSCTransmitter transmitter;
 
-    public List<ScreenEffect> ScreenEffects = new List<ScreenEffect>();
-    private Dictionary<string, ScreenEffect> IPs = new Dictionary<string, ScreenEffect>();
+
+    public List<ScreenEffects> ScreenEffectss = new List<ScreenEffects>();
+    private Dictionary<string, ScreenEffects> IPs = new Dictionary<string, ScreenEffects>();
 
     void Awake()
     {
@@ -53,28 +57,36 @@ public class GameManagerOSC : MonoBehaviour
 
         transmitter.Send(startMsg);
         Debug.Log("[GameManager] Broadcasted /StartGame with " + startSequence.Count + " intervals");
+
+        string fileName = "Test2_360_200Mbps.mp4";
+        string fullPath = Path.Combine(Application.streamingAssetsPath, fileName);
+        GameObject.Find("VideoSkyboxPlayer").GetComponent<ConfigVideoSource>().PlayVideo(fullPath);
+
+        Debug.Log("[GameManager] Started pridebeats video");
     }
 
 
     public void DrumHit(string IP, string content)
     {
-        if (!IPs.TryGetValue(IP, out ScreenEffect screenEffect))
+        // 1. Assign a ScreenEffects to the IP if not already assigned - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        if (!IPs.TryGetValue(IP, out ScreenEffects ScreenEffects))
         {
-            // Assign the next unassigned ScreenEffect
-            foreach (var effect in ScreenEffects)
+            // Assign the next unassigned ScreenEffects
+            foreach (var effect in ScreenEffectss)
             {
                 if (!IPs.ContainsValue(effect))
                 {
-                    screenEffect = effect;
-                    IPs.Add(IP, screenEffect);
-                    Debug.Log($"[GameManager] Assigned new IP {IP} to a ScreenEffect.");
+                    ScreenEffects = effect;
+                    IPs.Add(IP, ScreenEffects);
+                    ScreenEffects.Init();
+                    Debug.Log($"[GameManager] Assigned new IP {IP} to a ScreenEffects.");
                     break;
                 }
             }
 
-            if (screenEffect == null)
+            if (ScreenEffects == null)
             {
-                Debug.LogWarning($"[GameManager] No available ScreenEffect left to assign for IP: {IP}");
+                Debug.LogWarning($"[GameManager] No available ScreenEffects left to assign for IP: {IP}");
                 return;
             }
         }
@@ -84,13 +96,13 @@ public class GameManagerOSC : MonoBehaviour
         {
             Debug.Log(IP + " in sync");
             // Activate the effect
-            screenEffect.ActivateEffects(true);
+            ScreenEffects.ActivateEffects(true);
         }
         else if (content.Contains("out of sync"))
         {
             Debug.Log(IP + " out of sync");
             // Activate the effect
-            screenEffect.ActivateEffects(false);
+            ScreenEffects.ActivateEffects(false);
         }
         else
         {

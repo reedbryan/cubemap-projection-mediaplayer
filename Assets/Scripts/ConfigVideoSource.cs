@@ -76,11 +76,12 @@ public class ConfigVideoSource : MonoBehaviour
             RenderSettings.skybox = skyboxMaterial;
             DynamicGI.UpdateEnvironment();
             PlayVideo(videoPaths[videoIndex]);
+            Debug.Log("Playing video: " + videoPaths[videoIndex]);
         }
     }
 
 
-    void PlayVideo(string fullPath)
+    public void PlayVideo(string fullPath)
     {
         #if UNITY_EDITOR || UNITY_STANDALONE
         string url = "file://" + fullPath;
