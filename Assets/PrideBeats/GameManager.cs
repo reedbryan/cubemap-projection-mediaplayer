@@ -1,67 +1,110 @@
 using UnityEngine;
-using extOSC;
+using UnityEngine.UI;
+using TMPro;
 using System.Collections.Generic;
-using System.Net;
-using System.Net.Sockets;
 using System.IO;
 
 public class GameManager : MonoBehaviour
 {
-    public int questPort;
-    public int localPort;
+    public OSCMessaging oscMessaging;
 
-    public ConfigVideoSource configVideoSource;
-    private OSCTransmitter transmitter;
+    // Game States - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    private enum GameState
+    {
+        SessionClosed,
+        SessionOpen,
+        Calibrating,
+        GameStarting,
+        GameOn
+    }
+    [Header("Current Game State")]
+    [SerializeField] private GameState currentState = GameState.SessionClosed;
+    // read-only public accessor
+    private GameState CurrentState => currentState;
+    //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
+    // UI - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    [Header("Start Session Button")]
+    public Button startSessionButton;
+    [Header("Launch Game Button")]
+    public Button lauchGameButton;
+    [Header("Countdown")]
+    public TextMeshProUGUI countdownText;
+    public GameObject countdownObject;
+    [Header("Player List")]
+    public TextMeshProUGUI playerListText;
+    public GameObject playerListObject;
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+    // Effects - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
     public List<ScreenEffects> ScreenEffectss = new List<ScreenEffects>();
     private Dictionary<string, ScreenEffects> IPs = new Dictionary<string, ScreenEffects>();
+    //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-    // Store local IP for reuse
-    private string localIPAddress;
+    // Drum Beat Handling - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    public List<float> startSequence = new List<float>();
+    [SerializeField] private Dictionary<string, int> PlayerCalibration = new Dictionary<string, int>();
+    //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-    void Awake()
-    {
-        // Get and store local IP once
-        localIPAddress = GetLocalIPAddress();
-        Debug.Log("[GameManager] Local IP: " + localIPAddress);
+    void Start()
+    {   
+        // Configure UI
+        startSessionButton.gameObject.SetActive(true);
+        lauchGameButton.gameObject.SetActive(false);
+        playerListObject.gameObject.SetActive(false);
+        countdownObject.gameObject.SetActive(false);
+        
+        // Set state
+        currentState = GameState.SessionClosed;
 
-        // Setup transmitter to broadcast
-        transmitter = gameObject.AddComponent<OSCTransmitter>();
-        string broadcastIP = NetworkUtils.GetBroadcastAddress();
-        Debug.Log("Broadcast IP: " + broadcastIP);
-        transmitter.RemoteHost = broadcastIP;
-        transmitter.RemotePort = 8100; // Port that Quests are listening on
-
-        Debug.Log("[GameManager] Ready to broadcast to all Quests.");
+        // Assign listeners
+        startSessionButton.onClick.AddListener(StartSession);
+        lauchGameButton.onClick.AddListener(LauchGame);
     }
 
-    private bool GameOn = false;
-    void Update()
+
+    public void StartSession()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            StartGame();
-            GameOn = true;
-            Debug.Log("Starting game");
-        }
+        // Configure UI
+        startSessionButton.gameObject.SetActive(false);
+        lauchGameButton.gameObject.SetActive(true);
+        playerListObject.gameObject.SetActive(true);
+        countdownObject.gameObject.SetActive(false);
+        
+        // Set state
+        currentState = GameState.SessionOpen;
+        
+        // Send OSC
+        oscMessaging.Send_SessionOpen();
     }
 
-    public List<float> startSequence = new List<float> { 0.5f, 1.0f, 0.75f }; // Example pattern
+    public void LauchGame()
+    {
+        // Configure UI
+        startSessionButton.gameObject.SetActive(false);
+        lauchGameButton.gameObject.SetActive(false);
+        playerListObject.gameObject.SetActive(false);
+        countdownObject.gameObject.SetActive(false);
+        
+        // Set state
+        currentState = GameState.Calibrating;
+        
+        // Send OSC
+        oscMessaging.Send_Calibrate();
+    }
+
     public void StartGame()
     {
-        var startMsg = new OSCMessage("/StartGame");
-
-        // Add the float sequence to the message
-        foreach (float value in startSequence)
-        {
-            startMsg.AddValue(OSCValue.Float(value));
-        }
-
-        // ✅ Add the local IP as a string argument
-        startMsg.AddValue(OSCValue.String(localIPAddress));
-
-        transmitter.Send(startMsg);
-        Debug.Log("[GameManager] Broadcasted /StartGame with " + startSequence.Count + " intervals + IP " + localIPAddress);
+        // Configure UI
+        startSessionButton.gameObject.SetActive(false);
+        lauchGameButton.gameObject.SetActive(false);
+        playerListObject.gameObject.SetActive(false);
+        countdownObject.gameObject.SetActive(false);
+        
+        // Set state
+        currentState = GameState.GameOn;
+        
+        oscMessaging.Send_StartGame(startSequence);
 
         // Play video
         string fileName = "Test2_360_200Mbps.mp4";
@@ -72,6 +115,43 @@ public class GameManager : MonoBehaviour
     }
 
     public void DrumHit(string IP, string content)
+    {
+        if (currentState == GameState.SessionOpen)
+        {
+            JoinSessionBeat(IP, content);
+        }
+        if (currentState == GameState.Calibrating)
+        {
+            CalibrationBeat(IP, content);
+        }
+        if (currentState == GameState.GameOn)
+        {
+            GameOnBeat(IP, content);
+        }
+    }
+
+    private void JoinSessionBeat(string IP, string content)
+    {
+        // If this IP hasn't been seen before, add it with a starting value of 0
+        if (!PlayerCalibration.ContainsKey(IP))
+        {
+            PlayerCalibration[IP] = 0;
+            Debug.Log($"new player: {IP} Joined the session.");
+        }
+
+        // Build the player list string
+        string playerListDisplay = "";
+        foreach (var kvp in PlayerCalibration)
+        {
+            playerListDisplay += $"- Headset: {kvp.Key} : {kvp.Value} -\n";
+        }
+
+        // Update UI text
+        playerListText.text = playerListDisplay;
+    }
+
+
+    private void GameOnBeat(string IP, string content)
     {
         // Assign ScreenEffects if not already mapped
         if (!IPs.TryGetValue(IP, out ScreenEffects ScreenEffects))
@@ -112,23 +192,34 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // 🔹 Utility to get local IPv4 address
-    private string GetLocalIPAddress()
+    private void CalibrationBeat(string IP, string content)
     {
-        string ipAddress = "0.0.0.0";
-        try
+        // If this IP hasn't been seen before, add it with a starting value of 0
+        if (!PlayerCalibration.ContainsKey(IP))
         {
-            using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, 0))
+            PlayerCalibration[IP] = 0;
+            Debug.Log($"[Calibration] Added new player {IP} to calibration list.");
+        }
+
+        // Increment calibration count for this IP
+        if (PlayerCalibration[IP] < 3)
+            PlayerCalibration[IP]++;
+        
+        // Check for all players calibrated
+        bool allReady = true;
+        foreach (var kvp in PlayerCalibration)
+        {
+            if (kvp.Value < 3)
             {
-                socket.Connect("8.8.8.8", 65530);
-                IPEndPoint endPoint = socket.LocalEndPoint as IPEndPoint;
-                ipAddress = endPoint.Address.ToString();
+                allReady = false;
+                break;
             }
+        } // if all players calibrated --> start the game
+        if (allReady) {
+            Debug.Log("all players calibrated, GAME ON");
+            StartGame();
         }
-        catch (System.Exception ex)
-        {
-            Debug.LogWarning($"[GameManager] Could not determine local IP: {ex.Message}");
-        }
-        return ipAddress;
+
+        Debug.Log($"[Calibration] {IP} beat count: {PlayerCalibration[IP]}");
     }
 }

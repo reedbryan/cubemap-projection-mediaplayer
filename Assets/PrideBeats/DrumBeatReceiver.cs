@@ -18,6 +18,7 @@ public class OSCReceiverAll : MonoBehaviour
         // This binds to all addresses starting with "/"
         receiver.Bind("*", OnAnyMessage);  // Use "*" instead of "BindAll"
         receiver.Bind("/DrumHit", OnDrumHit); 
+        receiver.Bind("/Ready", NewPlayerJoined); 
 
         Debug.Log($"OSC Receiver started on port {port}, listening to all addresses");
     }
@@ -31,12 +32,17 @@ public class OSCReceiverAll : MonoBehaviour
             string content = message.Values[0].StringValue;
             string ip = message.Values[1].StringValue;
 
-            //Debug.Log($"  Content: {content}");            
+            Debug.Log($"  Content: {content}");            
         }
         else
         {
             //Debug.LogWarning("Received message does not contain expected number of values.");
         }
+    }
+
+    private void NewPlayerJoined(OSCMessage message)
+    {
+        Debug.Log($"PLAYER JOINED");
     }
 
     private void OnDrumHit(OSCMessage message)
@@ -45,5 +51,7 @@ public class OSCReceiverAll : MonoBehaviour
         string ip = message.Values[1].StringValue;
 
         GM.DrumHit(ip, content);
+
+        Debug.Log("HUUUUUUUUHHHHHHHHHHHH");
     }
 }
