@@ -83,6 +83,10 @@ public class ConfigVideoSource : MonoBehaviour
 
     public void PlayVideo(string fullPath)
     {
+        // Ensure video skybox is active
+        RenderSettings.skybox = skyboxMaterial;
+        DynamicGI.UpdateEnvironment();
+
         #if UNITY_EDITOR || UNITY_STANDALONE
         string url = "file://" + fullPath;
         #elif UNITY_ANDROID
@@ -95,4 +99,5 @@ public class ConfigVideoSource : MonoBehaviour
         videoPlayer.Prepare();
         videoPlayer.prepareCompleted += (vp) => vp.Play();
     }
+
 }
