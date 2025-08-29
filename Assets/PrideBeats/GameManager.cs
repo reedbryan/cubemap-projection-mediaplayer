@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 public class GameManager : MonoBehaviour
 {
@@ -34,6 +35,8 @@ public class GameManager : MonoBehaviour
     [Header("Player List")]
     public TextMeshProUGUI playerListText;
     public GameObject playerListObject;
+    [Header("Caibration Status Graphic Prefab")]
+    public GameObject calibrationStatusUI;
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
     // Effects - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -41,8 +44,11 @@ public class GameManager : MonoBehaviour
     private Dictionary<string, ScreenEffects> IPs = new Dictionary<string, ScreenEffects>();
     //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-    // Drum Beat Handling - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-    public List<float> startSequence = new List<float>();
+    // Gameplay Handling - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    [Tooltip("Count down time before notes start appearing")]
+    public float countDown;
+    private float playTimer = 0f;
+    public List<float> noteSequence = new List<float>();
     [SerializeField] private Dictionary<string, int> PlayerCalibration = new Dictionary<string, int>();
     //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
@@ -99,12 +105,19 @@ public class GameManager : MonoBehaviour
         startSessionButton.gameObject.SetActive(false);
         lauchGameButton.gameObject.SetActive(false);
         playerListObject.gameObject.SetActive(false);
-        countdownObject.gameObject.SetActive(false);
+        countdownObject.gameObject.SetActive(true);
         
         // Set state
         currentState = GameState.GameOn;
         
-        oscMessaging.Send_StartGame(startSequence);
+        // Send OSC
+        oscMessaging.Send_StartGame(countDown, noteSequence);
+
+        // Calculate total play time
+        float playTime = noteSequence.Sum() + countDown + 1f; // 1f is a buffer
+
+        // Start play timer
+        playTimer = playTime;
 
         // Play video
         string fileName = "Test2_360_200Mbps.mp4";
@@ -113,7 +126,42 @@ public class GameManager : MonoBehaviour
 
         Debug.Log("[GameManager] Started pridebeats video");
     }
+    void Update(){
+        if (playTimer > 0){
+            
+            // decrement the game timer
+            playTimer -= Time.deltaTime;
+            
+            // if in  the countdown phase
+            if (playTimer > noteSequence.Sum())
+            {
+                countdownText.text = $"{Mathf.FloorToInt(playTimer - noteSequence.Sum() + 0.1f)}";
+            }
+            else
+            {
+                countdownObject.gameObject.SetActive(false);
+            }
+        }
+        else if (currentState == GameState.GameOn){
+            EndGame();
+        }
+    }
+    private void EndGame()
+    {
+        // Configure UI
+        startSessionButton.gameObject.SetActive(false);
+        lauchGameButton.gameObject.SetActive(true);
+        playerListObject.gameObject.SetActive(true);
+        countdownObject.gameObject.SetActive(false);
+        
+        currentState = GameState.SessionOpen;
 
+        // Send OSC
+        oscMessaging.Send_EndGame();
+    }
+    
+
+    // All the different responses to a drum hit, depending on the current state of the game
     public void DrumHit(string IP, string content)
     {
         if (currentState == GameState.SessionOpen)
@@ -143,7 +191,7 @@ public class GameManager : MonoBehaviour
         string playerListDisplay = "";
         foreach (var kvp in PlayerCalibration)
         {
-            playerListDisplay += $"- Headset: {kvp.Key} : {kvp.Value} -\n";
+            playerListDisplay += $"- Headset: {kvp.Key}, Is Calibrated: {kvp.Value >= 3} -\n";
         }
 
         // Update UI text
@@ -200,10 +248,15 @@ public class GameManager : MonoBehaviour
             PlayerCalibration[IP] = 0;
             Debug.Log($"[Calibration] Added new player {IP} to calibration list.");
         }
+        else {
+            Debug.Log($"IP: {IP}, calibration count: {PlayerCalibration[IP]}");
+        }
 
         // Increment calibration count for this IP
         if (PlayerCalibration[IP] < 3)
+        {
             PlayerCalibration[IP]++;
+        }
         
         // Check for all players calibrated
         bool allReady = true;

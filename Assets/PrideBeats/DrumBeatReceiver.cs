@@ -32,7 +32,7 @@ public class OSCReceiverAll : MonoBehaviour
             string content = message.Values[0].StringValue;
             string ip = message.Values[1].StringValue;
 
-            Debug.Log($"  Content: {content}");            
+            Debug.Log($" IP: {ip}, Content: {content}");            
         }
         else
         {
@@ -51,7 +51,5 @@ public class OSCReceiverAll : MonoBehaviour
         string ip = message.Values[1].StringValue;
 
         GM.DrumHit(ip, content);
-
-        Debug.Log("HUUUUUUUUHHHHHHHHHHHH");
     }
 }

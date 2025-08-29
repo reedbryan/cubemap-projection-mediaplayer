@@ -39,19 +39,30 @@ public class OSCMessaging : MonoBehaviour
         transmitter.Send(msg);
     }
 
-    public void Send_StartGame(System.Collections.Generic.List<float> sequence)
+    public void Send_StartGame(float countDown, System.Collections.Generic.List<float> sequence)
     {
         var msg = new OSCMessage("/StartGame");
 
+        // pass initial cowndown time
+        msg.AddValue(OSCValue.Float(countDown));
+
+        // pass notes sequence
         foreach (float value in sequence)
         {
             msg.AddValue(OSCValue.Float(value));
         }
 
+        // Pass ip address
         msg.AddValue(OSCValue.String(localIPAddress));
         transmitter.Send(msg);
 
         Debug.Log("[OSCMessaging] Broadcasted /StartGame with " + sequence.Count + " intervals + IP " + localIPAddress);
+    }
+
+    public void Send_EndGame()
+    {
+        var msg = new OSCMessage("/EndGame");
+        transmitter.Send(msg);
     }
 
     // Utility to get local IPv4 address
