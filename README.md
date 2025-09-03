@@ -1,6 +1,6 @@
 # Cubemap Projection Media Player
 
-This Unity project is designed for immersive video installations using 360-degree video footage. It converts 360 videos into cubemapped equirectangular projections, splitting the content across three displays (typically projectors) to create a surround-view experience. The system includes tools for display calibration and post-processing to ensure visual consistency across varied projector hardware.
+This Unity project is designed for immersive video installations using 360-degree, monoscopic video footage. It converts 360 videos into a cubemapped equirectangular projection for a 270d space, splitting the content across three displays (typically projectors) to create a surround-view experience. The system includes tools for display calibration and post-processing to ensure visual consistency across varied projector hardware.
 
 ## Features
 
@@ -25,7 +25,7 @@ Each of the three display outputs can be individually adjusted to account for pr
 * **Saturation**
 * **Gamma**
 
-Settings are handled by the `DisplayPostProcessing.cs` script.
+Settings are handled by the [BrightnessController.cs](https://github.com/reedbryan/cubemap-projection-mediaplayer/blob/master/Assets/Scripts/PostProcessing/BrightnessController.cs) script.
 
 > \[IMAGE PLACEHOLDER: UI for adjusting post-processing parameters]
 
