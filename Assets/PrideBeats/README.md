@@ -1,11 +1,11 @@
-# Pride Beats XR Experience (Controller Build)
+# Pride Beats XR Experience Game Manager
 
 > **XR experience**: This README covers the **PC Unity project** that projects the 360° footage across three walls and orchestrates multi‑headset sessions via OSC.
 
 ---
 
 ## Overview
-The PC app is adapted from a 360° wall‑projection player. For **Pride Beats**, it plays Vancouver Pride Parade footage while managing connected headsets (session lifecycle, calibration, countdown, gameplay timing, feedback) over **OSC**. It broadcasts discovery messages so headsets can find and cache the controller IP.
+This folder is an extention of the cubemap projection player, used for the **Pride Beats** XR experience. This project manages the connected headsets via broadcasted **OSC** messages (session lifecycle, calibration, countdown, gameplay timing, feedback).
 
 
 ## Features
