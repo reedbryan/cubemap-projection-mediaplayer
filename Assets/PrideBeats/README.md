@@ -5,15 +5,16 @@
 ---
 
 ## Overview
-This folder is an extention of the cubemap projection player, used for the **Pride Beats** XR experience. This project manages the connected headsets via broadcasted **OSC** messages (session lifecycle, calibration, countdown, gameplay timing, feedback).
+This folder is an extention of the [cubemap projection player](https://github.com/reedbryan/cubemap-projection-mediaplayer), used in the **Pride Beats** XR experience.
+
+This project manages the connected headsets via broadcasted **OSC** messages (session lifecycle, calibration, countdown, gameplay timing, feedback).
 
 
 ## Features
 - 🧭 **State machine** for operator‑driven sessions
 - 🛰️ **OSC broadcast discovery** (`/SessionOpen` with IP)
-- 📋 Live **player list** with calibration status
+- 📋 Live **player list** with calibration status for organizing the session
 - ⏱️ Countdown & **note‑sequence** timing
-- 🎬 360° video playback across **3 walls** (existing projection pipeline)
 - 🧩 Minimal, kiosk‑friendly UI
 
 
