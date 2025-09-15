@@ -6,15 +6,16 @@ This Unity project is designed for immersive video installations using 360-degre
 
 ### 360 Video Playback
 
-* Drop 360 video files into the `StreamingAssets/` folder.
-* Videos are automatically detected and processed at runtime.
-* Supports equirectangular input format and cubemap-based rendering.
+* Drop 360 video files into the [StreamingAssets/](https://github.com/reedbryan/cubemap-projection-mediaplayer/tree/master/Assets/StreamingAssets) folder.
+* Videos are automatically detected and can be selected and changed at runtime.
 
 ### Multi-Display Projection
 
 * Renders video simultaneously across **three displays**.
 * Intended for rooms with three adjacent walls and synchronized projectors.
 * Seamlessly blends footage to simulate a wraparound environment.
+
+[](image here!!!!)
 
 ### Post-Processing Controls
 
@@ -33,7 +34,7 @@ Settings are handled by the [BrightnessController.cs](https://github.com/reedbry
 
 * Adjust each camera's **tilt and rotation** in real-time.
 * Fix misalignments without restarting the application.
-* `CameraAlignmentManager.cs` manages these updates per display.
+* [VerticalCameraRotation.cs](https://github.com/reedbryan/cubemap-projection-mediaplayer/blob/master/Assets/Scripts/Cameras/VerticalCameraRotation.cs) manages these updates per display.
 
 > \[IMAGE PLACEHOLDER: Side-by-side comparison of corrected vs uncorrected projection]
 
@@ -42,7 +43,7 @@ Settings are handled by the [BrightnessController.cs](https://github.com/reedbry
 * Save and load projector/display presets.
 * Useful for venues that reuse the same setup.
 * Presets are stored in JSON format for easy editing and sharing.
-* Managed by `PresetManager.cs`
+* Managed by [SettingsManager.cs](https://github.com/reedbryan/cubemap-projection-mediaplayer/blob/master/Assets/Scripts/PostProcessing/SettingsManager.cs) & [SettingsController.cs](https://github.com/reedbryan/cubemap-projection-mediaplayer/blob/master/Assets/Scripts/PostProcessing/SettingsController.cs)
 
 ### Passive Panning
 
@@ -50,7 +51,7 @@ Settings are handled by the [BrightnessController.cs](https://github.com/reedbry
 * Toggle between static view and passive rotation.
 * Useful for guided or ambient experiences.
 
-Controlled by `CameraPanning.cs`
+Controlled by [PanningManager.cs](https://github.com/reedbryan/cubemap-projection-mediaplayer/blob/master/Assets/Scripts/Cameras/PanningManager.cs)
 
 > \[IMAGE PLACEHOLDER: Example of passive panning path over time]
 
@@ -77,8 +78,7 @@ Assets/StreamingAssets/
 
 5. Run the application with three displays connected to your PC. The projection will automatically map one camera output per display.
 
-## Notes
-
+### Notes
 * Ensure all three displays/projectors are recognized by the OS **before** launching the application.
 * Use consistent resolution and refresh rate across all displays.
 * Don't worry about diplay order, that can be configured at runtime.
