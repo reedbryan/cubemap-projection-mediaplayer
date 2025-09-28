@@ -28,6 +28,10 @@ Each of the three display outputs can be individually adjusted to account for pr
 * **Saturation**
 * **Gamma**
 
+| ![No Post-Processing](https://github.com/reedbryan/cubemap-projection-mediaplayer/blob/master/Assets/ReadmeMedia/PP_noPP.png) | ![Saturation + Contrast](https://github.com/reedbryan/cubemap-projection-mediaplayer/blob/master/Assets/ReadmeMedia/PP_contrast.png) |
+|-------------------------|-------------------------|
+
+
 Settings are handled by the [BrightnessController.cs](https://github.com/reedbryan/cubemap-projection-mediaplayer/blob/master/Assets/Scripts/PostProcessing/BrightnessController.cs) script.
 
 > \[IMAGE PLACEHOLDER: UI for adjusting post-processing parameters]
@@ -37,8 +41,6 @@ Settings are handled by the [BrightnessController.cs](https://github.com/reedbry
 * Adjust each camera's **tilt and rotation** in real-time.
 * Fix misalignments without restarting the application.
 * [VerticalCameraRotation.cs](https://github.com/reedbryan/cubemap-projection-mediaplayer/blob/master/Assets/Scripts/Cameras/VerticalCameraRotation.cs) manages these updates per display.
-
-> \[IMAGE PLACEHOLDER: Side-by-side comparison of corrected vs uncorrected projection]
 
 ### Presets
 
@@ -54,8 +56,6 @@ Settings are handled by the [BrightnessController.cs](https://github.com/reedbry
 * Useful for guided or ambient experiences.
 
 Controlled by [PanningManager.cs](https://github.com/reedbryan/cubemap-projection-mediaplayer/blob/master/Assets/Scripts/Cameras/PanningManager.cs)
-
-> \[IMAGE PLACEHOLDER: Example of passive panning path over time]
 
 ## Installation & Usage
 
