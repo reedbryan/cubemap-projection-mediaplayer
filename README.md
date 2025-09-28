@@ -2,6 +2,8 @@
 
 This Unity project is designed for immersive video installations using 360-degree, monoscopic video footage. It converts 360 videos into a cubemapped equirectangular projection for a 270d space, splitting the content across three displays (typically projectors) to create a surround-view experience. The system includes tools for display calibration and post-processing to ensure visual consistency across varied projector hardware.
 
+![alt text](https://github.com/reedbryan/cubemap-projection-mediaplayer/blob/master/Assets/ReadmeMedia/reed_centerpiece.png)
+
 ## Features
 
 ### 360 Video Playback
