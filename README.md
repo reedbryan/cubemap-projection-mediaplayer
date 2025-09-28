@@ -15,7 +15,7 @@ This Unity project is designed for immersive video installations using 360-degre
 * Intended for rooms with three adjacent walls and synchronized projectors.
 * Seamlessly blends footage to simulate a wraparound environment.
 
-![alt text]()
+![alt text](https://github.com/reedbryan/cubemap-projection-mediaplayer/blob/master/Assets/ReadmeMedia/3_2_view_no_people.png)
 
 ### Post-Processing Controls
 
