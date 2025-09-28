@@ -15,7 +15,7 @@ This Unity project is designed for immersive video installations using 360-degre
 * Intended for rooms with three adjacent walls and synchronized projectors.
 * Seamlessly blends footage to simulate a wraparound environment.
 
-[](image here!!!!)
+![alt text]()
 
 ### Post-Processing Controls
 
