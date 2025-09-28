@@ -34,7 +34,7 @@ Each of the three display outputs can be individually adjusted to account for pr
 
 Settings are handled by the [BrightnessController.cs](https://github.com/reedbryan/cubemap-projection-mediaplayer/blob/master/Assets/Scripts/PostProcessing/BrightnessController.cs) script.
 
-> \[IMAGE PLACEHOLDER: UI for adjusting post-processing parameters]
+![alt text](https://github.com/reedbryan/cubemap-projection-mediaplayer/blob/master/Assets/ReadmeMedia/UI.png)
 
 ### Real-Time Camera Alignment
 
